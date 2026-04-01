@@ -1,0 +1,17 @@
+sale_id,sale_date,doctor_name,city,product,units,unit_price,target_units
+1,2026-03-01,Anita Sharma,Mumbai,CardioPlus,120,50,100
+2,2026-03-02,Rahul Mehta,Delhi,GlucoCare,90,60,95
+3,2026-03-03,Neha Verma,Bengaluru,DermoHeal,70,40,75
+4,2026-03-04,Arjun Rao,Chennai,MediPrime,110,45,100
+5,2026-03-05,Priya Nair,Kochi,KidSafe,140,35,130
+6,2026-03-06,Vikram Singh,Jaipur,CardioPlus,85,50,90
+7,2026-03-07,Sanya Kapoor,Pune,OrthoFlex,95,55,90
+8,2026-03-08,Kunal Das,Kolkata,NeuroZen,80,65,85
+9,2026-03-09,Anita Sharma,Mumbai,CardioPlus,100,50,100
+10,2026-03-10,Rahul Mehta,Delhi,GlucoCare,130,60,95
+11,2026-03-11,Neha Verma,Bengaluru,DermoHeal,75,40,75
+12,2026-03-12,Arjun Rao,Chennai,MediPrime,105,45,100
+13,2026-03-13,Priya Nair,Kochi,KidSafe,120,35,130
+14,2026-03-14,Vikram Singh,Jaipur,CardioPlus,95,50,90
+15,2026-03-15,Sanya Kapoor,Pune,OrthoFlex,100,55,90
+16,2026-03-16,Kunal Das,Kolkata,NeuroZen,88,65,85

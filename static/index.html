@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pharma Data Platform MVP</title>
+    <style>
+      :root {
+        --bg: #f6f8fb;
+        --panel: #ffffff;
+        --ink: #12263a;
+        --muted: #546b81;
+        --brand: #0d9488;
+        --accent: #f59e0b;
+        --line: #dbe5ef;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Avenir Next", "Segoe UI", sans-serif;
+        background: radial-gradient(circle at 0% 0%, #def7f3 0%, #f6f8fb 40%);
+        color: var(--ink);
+      }
+
+      .wrap {
+        max-width: 1100px;
+        margin: 20px auto;
+        padding: 0 16px 24px;
+      }
+
+      .hero {
+        background: linear-gradient(120deg, #0f766e, #0d9488);
+        color: #fff;
+        padding: 18px;
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(13, 148, 136, 0.2);
+      }
+
+      .hero h1 {
+        margin: 0 0 6px;
+        font-size: 1.6rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+      }
+
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      select, button {
+        border: 1px solid #bfd1e3;
+        background: #fff;
+        color: var(--ink);
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-size: 0.95rem;
+      }
+
+      button {
+        background: var(--brand);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+
+      th, td {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #edf2f7;
+      }
+
+      th { color: var(--muted); font-weight: 600; }
+
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      .kpi {
+        background: #fbfdff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      .kpi .v { font-size: 1.25rem; font-weight: 700; color: var(--brand); }
+      .kpi .l { font-size: 0.8rem; color: var(--muted); }
+
+      .bar {
+        height: 10px;
+        border-radius: 999px;
+        background: #e7eef6;
+        overflow: hidden;
+      }
+
+      .bar > span {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, var(--brand), var(--accent));
+      }
+
+      @media (max-width: 760px) {
+        .kpis { grid-template-columns: 1fr; }
+        .hero h1 { font-size: 1.3rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="hero">
+        <h1>Pharma Data Platform MVP</h1>
+        <div>Snowflake-ready ETL + MDM golden records + call planning analytics</div>
+      </section>
+
+      <section class="panel" style="margin-top: 14px;">
+        <div class="filters">
+          <label>Region:</label>
+          <select id="region">
+            <option value="">All</option>
+            <option>North</option>
+            <option>South</option>
+            <option>East</option>
+            <option>West</option>
+          </select>
+
+          <label>Product:</label>
+          <select id="product">
+            <option value="">All</option>
+            <option>CardioPlus</option>
+            <option>GlucoCare</option>
+            <option>DermoHeal</option>
+            <option>MediPrime</option>
+            <option>KidSafe</option>
+            <option>OrthoFlex</option>
+            <option>NeuroZen</option>
+          </select>
+
+          <button id="reloadBtn">Refresh Dashboard</button>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="panel">
+          <h3>KPIs</h3>
+          <div class="kpis">
+            <div class="kpi"><div class="v" id="kpiRevenue">-</div><div class="l">Total Revenue</div></div>
+            <div class="kpi"><div class="v" id="kpiUnits">-</div><div class="l">Total Units</div></div>
+            <div class="kpi"><div class="v" id="kpiBonus">-</div><div class="l">Avg Bonus %</div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Call Plan (Top Doctors)</h3>
+          <table id="callPlanTbl"></table>
+        </div>
+
+        <div class="panel">
+          <h3>Doctor Segmentation</h3>
+          <table id="doctorsTbl"></table>
+        </div>
+
+        <div class="panel">
+          <h3>Sales Trend (Revenue by Day)</h3>
+          <div id="trendBars"></div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const fmtINR = (n) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n || 0);
+
+      function tableHTML(headers, rows) {
+        const head = `<tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr>`;
+        const body = rows.map((r) => `<tr>${r.map((x) => `<td>${x}</td>`).join("")}</tr>`).join("");
+        return head + body;
+      }
+
+      async function loadDashboard() {
+        const region = document.getElementById("region").value;
+        const product = document.getElementById("product").value;
+
+        const p = new URLSearchParams();
+        if (region) p.set("region", region);
+        if (product) p.set("product", product);
+
+        const [sales, callPlan, doctors] = await Promise.all([
+          fetch(`/sales?${p.toString()}`).then((r) => r.json()),
+          fetch(`/call-plan?limit=8&${p.toString()}`).then((r) => r.json()),
+          fetch(`/doctors?${region ? `region=${region}` : ""}`).then((r) => r.json()),
+        ]);
+
+        const totalRevenue = sales.reduce((acc, s) => acc + (s.total_revenue || 0), 0);
+        const totalUnits = sales.reduce((acc, s) => acc + (s.total_units || 0), 0);
+        const avgBonus = sales.length ? sales.reduce((acc, s) => acc + (s.avg_bonus_pct || 0), 0) / sales.length : 0;
+
+        document.getElementById("kpiRevenue").textContent = fmtINR(totalRevenue);
+        document.getElementById("kpiUnits").textContent = totalUnits.toFixed(0);
+        document.getElementById("kpiBonus").textContent = `${avgBonus.toFixed(1)}%`;
+
+        document.getElementById("callPlanTbl").innerHTML = tableHTML(
+          ["Doctor", "Region", "Product", "Rx Volume", "Priority"],
+          callPlan.map((c) => [c.doctor_name, c.region, c.product, c.rx_volume, c.call_priority])
+        );
+
+        document.getElementById("doctorsTbl").innerHTML = tableHTML(
+          ["Doctor", "City", "Segment", "Units", "Master Source"],
+          doctors.map((d) => [d.name, d.city, d.segment, d.total_units, d.master_source])
+        );
+
+        const trend = document.getElementById("trendBars");
+        trend.innerHTML = "";
+        const maxRevenue = Math.max(...sales.map((s) => s.total_revenue || 0), 1);
+        sales.forEach((s) => {
+          const row = document.createElement("div");
+          row.style.marginBottom = "10px";
+          row.innerHTML = `
+            <div style="display:flex;justify-content:space-between;font-size:0.85rem;color:#4e6377;margin-bottom:4px;">
+              <span>${s.sale_date} - ${s.product}</span>
+              <span>${fmtINR(s.total_revenue)}</span>
+            </div>
+            <div class="bar"><span style="width:${(s.total_revenue / maxRevenue) * 100}%"></span></div>
+          `;
+          trend.appendChild(row);
+        });
+      }
+
+      document.getElementById("reloadBtn").addEventListener("click", loadDashboard);
+      loadDashboard();
+    </script>
+  </body>
+</html>
