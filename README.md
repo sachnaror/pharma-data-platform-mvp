@@ -1,6 +1,8 @@
-# Pharma Data Platform MVP (Snowflake + ETL + MDM + Analytics)
+# Pharma Data Platform (Snowflake + ETL + MDM + Analytics)
 
 Lightweight prototype you can run locally in browser.
+
+
 
 ## What this includes
 - ETL pipeline (`extract_csv -> clean_transform -> load_to_snowflake/local`)
@@ -23,6 +25,9 @@ CSV (CRM + IQVIA + Sales)
    -> FastAPI
    -> Browser Dashboard
 ```
+
+![Prototype Screenshot](images/111.png)
+
 
 ## Quick start (local demo)
 1. Create and activate environment:
